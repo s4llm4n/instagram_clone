@@ -3,22 +3,26 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:instagram_clone/utils/colors.dart';
 import 'package:instagram_clone/widgets/text_field_input.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({ Key? key }) : super(key: key);
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({ Key? key }) : super(key: key);
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<SignupScreen> createState() => _SignupScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _bioController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController();
 
   @override
   void dispose() {
     super.dispose();
     _emailController.dispose();
     _passwordController.dispose();
+    _bioController.dispose();
+    _usernameController.dispose();
   }
   @override
   Widget build(BuildContext context) {
@@ -38,6 +42,15 @@ class _LoginScreenState extends State<LoginScreen> {
                 height: 64,
               ),
               const SizedBox(height: 64,),
+              // text field input for username
+              TextFieldInput(
+                hintText: 'Enter Your User Name', 
+                textInputType: TextInputType.text,
+                textEditingController: _usernameController,
+              ),
+              const SizedBox(
+                height: 24,
+              ),
               // text field input for email
               TextFieldInput(
                 hintText: 'Enter Your Email', 
@@ -53,6 +66,14 @@ class _LoginScreenState extends State<LoginScreen> {
                 textInputType: TextInputType.text,
                 textEditingController: _passwordController,
                 isPass: true,
+              ),
+              const SizedBox(
+                height: 24,
+              ),
+              TextFieldInput(
+                hintText: 'Enter Your Bio', 
+                textInputType: TextInputType.text,
+                textEditingController: _bioController,
               ),
               const SizedBox(
                 height: 24,
