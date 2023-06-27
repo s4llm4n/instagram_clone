@@ -1,6 +1,11 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:instagram_clone/resources/auth_methods.dart';
 import 'package:instagram_clone/utils/colors.dart';
+import 'package:instagram_clone/utils/utils.dart';
 import 'package:instagram_clone/widgets/text_field_input.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -15,6 +20,8 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _usernameController = TextEditingController();
+  Uint8List? _image;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -24,6 +31,35 @@ class _SignupScreenState extends State<SignupScreen> {
     _bioController.dispose();
     _usernameController.dispose();
   }
+
+  void selectImage() async {
+    Uint8List im = await pickImage(ImageSource.gallery);
+    setState(() {
+      _image = im;
+    });
+  }
+
+  void signUpUser() async {
+    setState(() {
+      _isLoading = true;
+    });
+    String res = await AuthMethods().signUpUser(
+      email: _emailController.text, 
+      password: _passwordController.text, 
+      username: _usernameController.text, 
+      bio: _bioController.text,
+      file: _image!,
+    );
+
+    setState(() {
+      _isLoading = false;
+    });
+    
+    if (res != 'success') {
+      showSnackBar(res, context);
+    } 
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -42,6 +78,32 @@ class _SignupScreenState extends State<SignupScreen> {
                 height: 64,
               ),
               const SizedBox(height: 64,),
+              // circular widget to accept and show our selection file
+              Stack(
+                children: [
+                  _image!=null
+                  ? CircleAvatar(
+                    radius: 64,
+                    backgroundImage: MemoryImage(_image!),
+                  )
+                  : const CircleAvatar(
+                    radius: 64,
+                    backgroundImage: NetworkImage(
+                      'https://t4.ftcdn.net/jpg/00/64/67/63/360_F_64676383_LdbmhiNM6Ypzb3FM4PPuFP9rHe7ri8Ju.jpg'),
+                  ),
+                  Positioned(
+                    bottom: -10,
+                    left: 80,
+                    child: IconButton(
+                      onPressed: selectImage, 
+                      icon: const Icon(
+                        Icons.add_a_photo,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 24,),
               // text field input for username
               TextFieldInput(
                 hintText: 'Enter Your User Name', 
@@ -80,8 +142,15 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
               // button login
               InkWell(
+                onTap: signUpUser,
                 child: Container(
-                  child: const Text('Log In'),
+                  child: _isLoading
+                    ? const Center(
+                      child: CircularProgressIndicator(
+                        color: primaryColor,
+                      ),
+                    )
+                  : const Text('Sign Up'),
                   width: double.infinity,
                   alignment: Alignment.center,
                   padding: const EdgeInsets.symmetric(vertical: 12),
@@ -105,14 +174,14 @@ class _SignupScreenState extends State<SignupScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Container(
-                    child: const Text('Dont have an account?'),
+                    child: const Text('Have an account?'),
                     padding: const EdgeInsets.symmetric(vertical: 8),
                   ),
                   GestureDetector(
                     onTap: () {},
                     child: Container(
                       child: const Text(
-                        '  Sign Up',
+                        '  Sign In',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                         ),
